@@ -61,7 +61,10 @@
     }
 
     #viewer img {
-      max-width: 600px;
+      max-width: 90vw;           /* Never exceed 90% of viewport width */
+      width: 100%;               /* Make image scale to fit container */
+      height: auto;              /* Preserve aspect ratio */
+      max-height: 70vh;          /* Never exceed 70% of viewport height */
       display: block;
       margin-bottom: 10px;
     }
