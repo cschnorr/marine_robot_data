@@ -168,7 +168,11 @@
         } else {
           imgs.forEach(img => {
             const el = document.createElement("img");
-            el.src = `img/${img}`;
+            if (locationSuffix === "loc1") {
+              el.src = `img/${img}`;
+            } else {
+              el.src = `loc2/${img}`;
+            }
             el.alt = img;
             viewer.appendChild(el);
           });
