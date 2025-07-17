@@ -151,6 +151,28 @@
     "Snap_013_6061.jpg", "Snap_013_6263.jpg", "Snap_013_6465.jpg", "Snap_013_6566.jpg"
   ];
 
+  // Qualitative observations for Location 1 (fill in your actual observations)
+  const observationsLoc1 = {
+    "00": "Observation for tile 00 at Porta da Horta Harbor.",
+    "01": "Rich in diatoms. Structure visible.",
+    "02": "Sparse debris, little biological activity.",
+    "03": "No significant features.",
+    "04": "Clusters of microalgae present.",
+    // You can fill in or expand as needed for other tiles, example below:
+    // "10": "...",
+    // "65": "...",
+  };
+
+  // Qualitative observations for Location 2 (fill in your actual observations)
+  const observationsLoc2 = {
+    "00": "Very different microflora at Porto Pim.",
+    "01": "High concentration of microalgae.",
+    "02": "Few specimens, mostly detritus.",
+    "03": "Clear and clean area, no visible debris.",
+    "04": "Some fibrous materials detected.",
+    // Fill in or expand as needed
+  };
+
   // Helper to build tile map from filenames
   function buildTileMap(imageFilenames) {
     const map = {};
@@ -169,8 +191,8 @@
   const tileMapLoc1 = buildTileMap(imageFilenamesLoc1);
   const tileMapLoc2 = buildTileMap(imageFilenamesLoc2);
 
-  // Create grid and viewer for a location
-  function createGridViewer(locationSuffix, tileMap) {
+  // Create grid and viewer for a location, with captions below photos
+  function createGridViewer(locationSuffix, tileMap, observations) {
     const grid = document.getElementById("grid-" + locationSuffix);
     const viewer = document.getElementById("viewer-" + locationSuffix);
     tileIDs.forEach(id => {
@@ -180,27 +202,29 @@
       cell.onclick = () => {
         viewer.innerHTML = "";
         const imgs = tileMap[id];
+        const caption = observations[id] || "No qualitative observation for this tile.";
         if (!imgs.length) {
-          viewer.innerHTML = `<p>No image found for tile ${id}</p>`;
+          viewer.innerHTML = `<p>No image found for tile ${id}</p><div style="margin-top:10px;color:#555;font-style:italic;">${caption}</div>`;
         } else {
           imgs.forEach(img => {
             const el = document.createElement("img");
-            if (locationSuffix === "loc1") {
-              el.src = `img/${img}`;
-            } else {
-              el.src = `loc2/${img}`;
-            }
+            el.src = locationSuffix === "loc1" ? `img/${img}` : `loc2/${img}`;
             el.alt = img;
             viewer.appendChild(el);
           });
+          // Add caption below images
+          const cap = document.createElement("div");
+          cap.style = "margin-top:10px;color:#555;font-style:italic;";
+          cap.textContent = caption;
+          viewer.appendChild(cap);
         }
       };
       grid.appendChild(cell);
     });
   }
 
-  createGridViewer("loc1", tileMapLoc1);
-  createGridViewer("loc2", tileMapLoc2);
+  createGridViewer("loc1", tileMapLoc1, observationsLoc1);
+  createGridViewer("loc2", tileMapLoc2, observationsLoc2);
 
   // Tab logic
   const tabs = document.querySelectorAll(".tab");
