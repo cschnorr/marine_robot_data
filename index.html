@@ -3,38 +3,51 @@
 <head>
   <meta charset="UTF-8" />
   <title>Microscope Grid Viewer</title>
-  <!-- Bootstrap CSS for professional look -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
     body {
-      min-height: 100vh;
-      margin: 0;
-      background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%);
-      color: #1a2634;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: sans-serif;
+      padding: 20px;
     }
-    .content-wrapper {
-      background: rgba(255,255,255,0.92);
-      border-radius: 16px;
-      box-shadow: 0 8px 32px 0 rgba(31,38,135,0.12);
-      padding: 2.5rem;
-      margin: 3rem auto;
-      max-width: 900px;
-      border: 1px solid rgba(255,255,255,0.15);
+
+    /* Tabs container */
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #ccc;
+      margin-bottom: 20px;
+      user-select: none;
     }
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      border-bottom: none;
+      font-weight: bold;
+      background-color: #f7f7f7;
+    }
+    .tab.active {
+      border-color: #ccc #ccc white;
+      background-color: white;
+    }
+    .tab:not(.active):hover {
+      background-color: #e6f0ff;
+    }
+
+    /* Layout for grid + viewer */
     .layout {
       display: flex;
       align-items: flex-start;
       gap: 40px;
-      flex-wrap: wrap;
+      flex-wrap: wrap; /* Wrap on smaller screens */
     }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(7, 60px);
       gap: 4px;
       margin-bottom: 0;
-      flex-shrink: 0;
+      flex-shrink: 0; /* Prevent shrinking */
     }
+
     .cell {
       width: 60px;
       height: 60px;
@@ -44,164 +57,167 @@
       line-height: 60px;
       cursor: pointer;
       font-weight: bold;
-      user-select: none;
-      border-radius: 4px;
-      transition: background-color 0.2s;
     }
     .cell:hover {
       background-color: #d0ebff;
     }
+
+    /* Viewer container max width */
+    #viewer-loc1,
+    #viewer-loc2 {
+      max-width: 650px;
+      width: 100%;
+    }
+
+    /* Images scale inside viewer */
     #viewer-loc1 img,
     #viewer-loc2 img {
-      width: 100%;
-      max-width: 600px;
+      max-width: 100%;
       max-height: 70vh;
       height: auto;
       display: block;
       margin-bottom: 10px;
-      border-radius: 8px;
+      border-radius: 6px;
       object-fit: contain;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-    #viewer-loc1, #viewer-loc2 {
-      max-width: 650px;
-      width: 100%;
-    }
-    @media (max-width: 900px) {
+
+    @media (max-width: 600px) {
       .layout {
         flex-direction: column;
         gap: 20px;
       }
       #viewer-loc1 img,
       #viewer-loc2 img {
-        max-width: 100vw;
         max-height: 40vh;
       }
     }
   </style>
 </head>
 <body>
-  <div class="content-wrapper">
-    <h1 class="mb-3 fw-bold">Microscope Grid Viewer</h1>
-    <p class="mb-4">Click any tile to view the associated microscope image.</p>
 
-    <!-- Tabs for locations -->
-    <ul class="nav nav-tabs mb-4" id="tabs" role="tablist">
-      <li class="nav-item" role="presentation">
-        <button class="nav-link active" type="button" data-location="loc1" role="tab" aria-selected="true">
-          Location 1: Porta da Horta Harbor
-        </button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" type="button" data-location="loc2" role="tab" aria-selected="false">
-          Location 2: Example Location
-        </button>
-      </li>
-    </ul>
+<h1>Microscope Grid Viewer</h1>
+<p>Click any tile to view the associated microscope image.</p>
 
-    <!-- Location 1 Content -->
-    <div class="location-content" id="loc1" style="display: block;">
-      <div class="layout">
-        <div class="grid" id="grid-loc1"></div>
-        <div id="viewer-loc1"></div>
-      </div>
-    </div>
-    <!-- Location 2 Content -->
-    <div class="location-content" id="loc2" style="display: none;">
-      <div class="layout">
-        <div class="grid" id="grid-loc2"></div>
-        <div id="viewer-loc2"></div>
-      </div>
-    </div>
+<!-- Tabs -->
+<div class="tabs" id="tabs">
+  <div class="tab active" data-location="loc1">Location 1: Porta da Horta Harbor</div>
+  <div class="tab" data-location="loc2">Location 2: Porto Pim</div>
+</div>
+
+<!-- Location 1 Content -->
+<div class="location-content" id="loc1" style="display: block;">
+  <div class="layout">
+    <div class="grid" id="grid-loc1"></div>
+    <div id="viewer-loc1"></div>
   </div>
+</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    // Tile IDs for both locations
-    const tileIDs = [];
-    for (let r = 0; r < 7; r++) {
-      for (let c = 0; c < 7; c++) {
-        tileIDs.push(`${r}${c}`);
+<!-- Location 2 Content -->
+<div class="location-content" id="loc2" style="display: none;">
+  <div class="layout">
+    <div class="grid" id="grid-loc2"></div>
+    <div id="viewer-loc2"></div>
+  </div>
+</div>
+
+<script>
+  // Common tile IDs for both locations
+  const tileIDs = [];
+  for (let r = 0; r < 7; r++) {
+    for (let c = 0; c < 7; c++) {
+      tileIDs.push(`${r}${c}`);
+    }
+  }
+
+  // Location 1 image filenames
+  const imageFilenamesLoc1 = [
+    "Snap_013_0001.jpg", "Snap_013_0203.jpg", "Snap_013_0405.jpg", "Snap_013_0506.jpg",
+    "Snap_013_1011.jpg", "Snap_013_1112.jpg", "Snap_013_1314.jpg", "Snap_013_1516.jpg",
+    "Snap_013_2021.jpg", "Snap_013_2223.jpg", "Snap_013_2425.jpg", "Snap_013_2526.jpg",
+    "Snap_013_3031.jpg", "Snap_013_3132.jpg", "Snap_013_3334.jpg", "Snap_013_3536.jpg",
+    "Snap_013_4041.jpg", "Snap_013_4243.jpg", "Snap_013_4445.jpg", "Snap_013_4546.jpg",
+    "Snap_013_5051.jpg", "Snap_013_5152.jpg", "Snap_013_5354.jpg", "Snap_013_5556.jpg",
+    "Snap_013_6061.jpg", "Snap_013_6263.jpg", "Snap_013_6465.jpg", "Snap_013_6566.jpg"
+  ];
+
+  // Location 2 image filenames (example)
+  const imageFilenamesLoc2 = [
+    "Snap_013_0001.jpg", "Snap_013_0203.jpg", "Snap_013_0405.jpg", "Snap_013_0506.jpg",
+    "Snap_013_1011.jpg", "Snap_013_1112.jpg", "Snap_013_1314.jpg", "Snap_013_1516.jpg",
+    "Snap_013_2021.jpg", "Snap_013_2223.jpg", "Snap_013_2425.jpg", "Snap_013_2526.jpg",
+    "Snap_013_3031.jpg", "Snap_013_3132.jpg", "Snap_013_3334.jpg", "Snap_013_3536.jpg",
+    "Snap_013_4041.jpg", "Snap_013_4243.jpg", "Snap_013_4445.jpg", "Snap_013_4546.jpg",
+    "Snap_013_5051.jpg", "Snap_013_5152.jpg", "Snap_013_5354.jpg", "Snap_013_5556.jpg",
+    "Snap_013_6061.jpg", "Snap_013_6263.jpg", "Snap_013_6465.jpg", "Snap_013_6566.jpg"
+  ];
+
+  // Helper to build tile map from filenames
+  function buildTileMap(imageFilenames) {
+    const map = {};
+    tileIDs.forEach(id => map[id] = []);
+    imageFilenames.forEach(name => {
+      const match = name.match(/(\d{2})(\d{2})\.jpg/);
+      if (match) {
+        const [_, t1, t2] = match;
+        if (map[t1]) map[t1].push(name);
+        if (map[t2]) map[t2].push(name);
       }
-    }
-
-    // Data: Update with your real image filenames
-    const imageFilenamesLoc1 = [
-      "Snap_013_0001.jpg", "Snap_013_0203.jpg", "Snap_013_0405.jpg", "Snap_013_0506.jpg",
-      "Snap_013_1011.jpg", "Snap_013_1112.jpg", "Snap_013_1314.jpg", "Snap_013_1516.jpg",
-      "Snap_013_2021.jpg", "Snap_013_2223.jpg", "Snap_013_2425.jpg", "Snap_013_2526.jpg",
-      "Snap_013_3031.jpg", "Snap_013_3132.jpg", "Snap_013_3334.jpg", "Snap_013_3536.jpg",
-      "Snap_013_4041.jpg", "Snap_013_4243.jpg", "Snap_013_4445.jpg", "Snap_013_4546.jpg",
-      "Snap_013_5051.jpg", "Snap_013_5152.jpg", "Snap_013_5354.jpg", "Snap_013_5556.jpg",
-      "Snap_013_6061.jpg", "Snap_013_6263.jpg", "Snap_013_6465.jpg", "Snap_013_6566.jpg"
-    ];
-    const imageFilenamesLoc2 = [
-      "Snap_014_0001.jpg", "Snap_014_0203.jpg", "Snap_014_0405.jpg",
-      "Snap_014_1112.jpg", "Snap_014_1314.jpg", "Snap_014_1516.jpg"
-    ];
-
-    // Utility: Build tileID -> images map
-    function buildTileMap(imageFilenames) {
-      const map = {};
-      tileIDs.forEach(id => map[id] = []);
-      imageFilenames.forEach(name => {
-        const match = name.match(/(\d{2})(\d{2})\.jpg/);
-        if (match) {
-          const [_, t1, t2] = match;
-          if (map[t1]) map[t1].push(name);
-          if (map[t2]) map[t2].push(name);
-        }
-      });
-      return map;
-    }
-    const tileMapLoc1 = buildTileMap(imageFilenamesLoc1);
-    const tileMapLoc2 = buildTileMap(imageFilenamesLoc2);
-
-    // Grid and viewer setup for each location
-    function createGridViewer(locationSuffix, tileMap) {
-      const grid = document.getElementById(`grid-${locationSuffix}`);
-      const viewer = document.getElementById(`viewer-${locationSuffix}`);
-      tileIDs.forEach(id => {
-        const cell = document.createElement("div");
-        cell.className = "cell";
-        cell.textContent = id;
-        cell.onclick = () => {
-          viewer.innerHTML = "";
-          const imgs = tileMap[id];
-          if (!imgs.length) {
-            viewer.innerHTML = `<p>No image found for tile ${id}</p>`;
-          } else {
-            imgs.forEach(img => {
-              const el = document.createElement("img");
-              el.src = `img/${img}`;
-              el.alt = img;
-              viewer.appendChild(el);
-            });
-          }
-        };
-        grid.appendChild(cell);
-      });
-    }
-    createGridViewer("loc1", tileMapLoc1);
-    createGridViewer("loc2", tileMapLoc2);
-
-    // Tab switching logic
-    const tabs = document.querySelectorAll("#tabs .nav-link");
-    const locationContents = document.querySelectorAll(".location-content");
-    tabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        tabs.forEach(t => {
-          t.classList.remove("active");
-          t.setAttribute("aria-selected", "false");
-        });
-        tab.classList.add("active");
-        tab.setAttribute("aria-selected", "true");
-        locationContents.forEach(content => (content.style.display = "none"));
-        const loc = tab.getAttribute("data-location");
-        const selectedContent = document.getElementById(loc);
-        if (selectedContent) selectedContent.style.display = "block";
-      });
     });
-  </script>
+    return map;
+  }
+
+  const tileMapLoc1 = buildTileMap(imageFilenamesLoc1);
+  const tileMapLoc2 = buildTileMap(imageFilenamesLoc2);
+
+  // Create grid and viewer for a location
+  function createGridViewer(locationSuffix, tileMap) {
+    const grid = document.getElementById("grid-" + locationSuffix);
+    const viewer = document.getElementById("viewer-" + locationSuffix);
+    tileIDs.forEach(id => {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      cell.textContent = id;
+      cell.onclick = () => {
+        viewer.innerHTML = "";
+        const imgs = tileMap[id];
+        if (!imgs.length) {
+          viewer.innerHTML = `<p>No image found for tile ${id}</p>`;
+        } else {
+          imgs.forEach(img => {
+            const el = document.createElement("img");
+            if (locationSuffix === "loc1") {
+              el.src = `img/${img}`;
+            } else {
+              el.src = `loc2/${img}`;
+            }
+            el.alt = img;
+            viewer.appendChild(el);
+          });
+        }
+      };
+      grid.appendChild(cell);
+    });
+  }
+
+  createGridViewer("loc1", tileMapLoc1);
+  createGridViewer("loc2", tileMapLoc2);
+
+  // Tab logic
+  const tabs = document.querySelectorAll(".tab");
+  const contents = document.querySelectorAll(".location-content");
+
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      tabs.forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+
+      contents.forEach(c => c.style.display = "none");
+
+      const loc = tab.getAttribute("data-location");
+      document.getElementById(loc).style.display = "block";
+    });
+  });
+</script>
+
 </body>
 </html>
