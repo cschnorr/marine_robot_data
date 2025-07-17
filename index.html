@@ -5,12 +5,21 @@
   <title>Microscope Grid Viewer</title>
   <style>
     body { font-family: sans-serif; padding: 20px; }
+
+    .layout {
+      display: flex;
+      align-items: flex-start;
+      gap: 40px;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(7, 60px);
       gap: 4px;
-      margin-bottom: 30px;
+      /* Removed margin-bottom to allow side-by-side layout */
+      margin-bottom: 0;
     }
+
     .cell {
       width: 60px;
       height: 60px;
@@ -24,10 +33,18 @@
     .cell:hover {
       background-color: #d0ebff;
     }
+
     #viewer img {
       max-width: 600px;
       display: block;
       margin-bottom: 10px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        flex-direction: column;
+        gap: 20px;
+      }
     }
   </style>
 </head>
@@ -36,9 +53,12 @@
 <h1>Microscope Grid Viewer</h1>
 <p>Click any tile to view the associated microscope image.</p>
 
-<div class="grid" id="grid"></div>
+<h2>Location 1 Data: Porta da Horta Harbor</h2>
 
-<div id="viewer"></div>
+<div class="layout">
+  <div class="grid" id="grid"></div>
+  <div id="viewer"></div>
+</div>
 
 <script>
   const tileIDs = [];
@@ -50,7 +70,14 @@
 
   const imageFilenames = [
     // List your actual filenames here:
-    "Snap_013_0001.jpg", "Snap_013_0102.jpg", "Snap_013_2425.jpg",
+    "Snap_013_0001.jpg", "Snap_013_0203.jpg", "Snap_013_0405.jpg","Snap_013_0506.jpg",
+    "Snap_013_1011.jpg", "Snap_013_1112.jpg", "Snap_013_1314.jpg", "Snap_013_1516.jpg",
+    "Snap_013_2021.jpg", "Snap_013_2223.jpg", "Snap_013_2425.jpg", "Snap_013_2526.jpg",
+    "Snap_013_3031.jpg", "Snap_013_3132.jpg", "Snap_013_3334.jpg", "Snap_013_3536.jpg",
+    "Snap_013_4041.jpg", "Snap_013_4243.jpg", "Snap_013_4445.jpg", "Snap_013_4546.jpg",
+    "Snap_013_5051.jpg", "Snap_013_5152.jpg", "Snap_013_5354.jpg", "Snap_013_5556.jpg",
+    "Snap_013_6061.jpg", "Snap_013_6263.jpg", "Snap_013_6465.jpg", "Snap_013_6566.jpg"
+
     // ...
   ];
 
