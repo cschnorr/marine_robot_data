@@ -162,7 +162,7 @@
 
   // Qualitative observations for Location 2 (fill in your actual observations)
   const observationsLoc2 = {
-    "00": "Very different microflora at Porto Pim.",
+    "00": "",
 
     // Fill in or expand as needed
   };
@@ -196,7 +196,7 @@
       cell.onclick = () => {
         viewer.innerHTML = "";
         const imgs = tileMap[id];
-        const caption = observations[id] || "No qualitative observation for this tile.";
+        const caption = observations[id] || "";
         if (!imgs.length) {
           viewer.innerHTML = `<p>No image found for tile ${id}</p><div style="margin-top:10px;color:#555;font-style:italic;">${caption}</div>`;
         } else {
